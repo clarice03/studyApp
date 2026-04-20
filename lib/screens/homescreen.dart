@@ -85,104 +85,104 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget buildTaskCard(Map<String, dynamic> task) {
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    margin: const EdgeInsets.symmetric(vertical: 6),
-    child: ListTile(
-      contentPadding: const EdgeInsets.all(12),
-
-      leading: Checkbox(
-        value: task["done"],
-        onChanged: (value) async {
-          setState(() {
-            task["done"] = value;
-          });
-
-          await saveTasks();
-
-          if (value == true) {
-            await NotificationService.showNotification(
-              title: "Task Completed 🎉",
-              body: task["title"],
-            );
-          }
-        },
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
 
-      title: Text(
-        task["title"],
-        style: TextStyle(
-          decoration:
-              task["done"] ? TextDecoration.lineThrough : null,
+        leading: Checkbox(
+          value: task["done"],
+          onChanged: (value) async {
+            setState(() {
+              task["done"] = value;
+            });
+
+            await saveTasks();
+
+            if (value == true) {
+              await NotificationService.showNotification(
+                title: "Task Completed 🎉",
+                body: task["title"],
+              );
+            }
+          },
+        ),
+
+        title: Text(
+          task["title"],
+          style: TextStyle(
+            decoration:
+                task["done"] ? TextDecoration.lineThrough : null,
+          ),
+        ),
+
+        subtitle: Text("Due: ${task["deadline"]}"),
+
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            // 🔹 Priority badge
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              decoration: BoxDecoration(
+                color: getPriorityColor(task["priority"]),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                task["priority"],
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+
+            const SizedBox(width: 8),
+
+            // 🔹 DELETE BUTTON WITH CONFIRMATION
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                final confirm = await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Delete Task"),
+                    content: const Text(
+                        "Are you sure you want to delete this task?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pop(context, false),
+                        child: const Text("Cancel"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () =>
+                            Navigator.pop(context, true),
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  setState(() {
+                    tasks.remove(task);
+                  });
+
+                  await saveTasks();
+                }
+              },
+            ),
+          ],
         ),
       ),
-
-      subtitle: Text("Due: ${task["deadline"]}"),
-
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-
-          // 🔹 Priority badge
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 5,
-            ),
-            decoration: BoxDecoration(
-              color: getPriorityColor(task["priority"]),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              task["priority"],
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // 🔹 DELETE BUTTON WITH CONFIRMATION
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () async {
-              final confirm = await showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("Delete Task"),
-                  content: const Text(
-                      "Are you sure you want to delete this task?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.pop(context, false),
-                      child: const Text("Cancel"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, true),
-                      child: const Text("Delete"),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true) {
-                setState(() {
-                  tasks.remove(task);
-                });
-
-                await saveTasks();
-              }
-            },
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
 
-      // ✅ IMPROVED EMPTY STATE
+      // ✅ EMPTY STATE (UNCHANGED)
       body: tasks.isEmpty
           ? Center(
               child: Column(
@@ -261,15 +261,18 @@ class _HomeScreenState extends State<HomeScreen>
                   const Text(
                     "📚 Your Study Tasks",
                     style: TextStyle(
-                        fontSize: 26, fontWeight: FontWeight.bold),
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 15),
 
-                  const Text(
-                    "Pending Tasks",
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600),
+                  // ✅ ONLY CHANGE: added count here
+                  Text(
+                    "Pending Tasks (${pending.length})",
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600),
                   ),
 
                   const SizedBox(height: 10),
@@ -281,9 +284,10 @@ class _HomeScreenState extends State<HomeScreen>
 
                         const SizedBox(height: 20),
 
-                        const Text(
-                          "Completed",
-                          style: TextStyle(
+                        // ✅ ONLY CHANGE: added count here
+                        Text(
+                          "Completed (${done.length})",
+                          style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600),
                         ),
