@@ -61,8 +61,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // 🔹 Title
             const Text(
               "Create a New Task",
               style: TextStyle(
@@ -72,8 +70,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
 
             const SizedBox(height: 20),
-
-            // 🔹 Task Title Input
             TextField(
               controller: titleController,
               decoration: const InputDecoration(
@@ -83,8 +79,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
 
             const SizedBox(height: 20),
-
-            // 🔹 Date Picker
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -98,8 +92,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
 
             const SizedBox(height: 20),
-
-            // 🔹 Priority Dropdown
             DropdownButtonFormField<String>(
               value: selectedPriority,
               decoration: const InputDecoration(
@@ -119,8 +111,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
 
             const SizedBox(height: 30),
-
-            // 🔹 Save Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

@@ -13,7 +13,6 @@ class _LibrariesScreenState extends State<LibrariesScreen> {
   Position? currentPosition;
   String status = "Press button to get your location";
 
-  // Example library (you can change this)
   final double libraryLat = 35.8997;
   final double libraryLng = 14.5146;
 

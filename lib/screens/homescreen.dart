@@ -244,8 +244,6 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
 
                   const SizedBox(height: 15),
-
-                  // 🔵 PROGRESS BAR (FINAL FEATURE)
                   Text(
                     "Progress: ${(progress * 100).toStringAsFixed(0)}%",
                     style: const TextStyle(fontSize: 16),
