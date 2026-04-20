@@ -10,26 +10,16 @@ import 'notificationService.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 📊 Analytics instance
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  await analytics.logEvent(name: 'app_started');
 
-  // 📊 Log test event (for DebugView testing)
-  await analytics.logEvent(
-    name: 'app_started',
-  );
-
-  print("🔥 Firebase Analytics event sent");
-
-  // 📦 Hive setup
   await Hive.initFlutter();
   await Hive.openBox('tasksBox');
 
-  // 🔔 Notifications
   await NotificationService.init();
 
   runApp(const StudyPlannerApp());
@@ -43,7 +33,14 @@ class StudyPlannerApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Exam Planner',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.grey[100],
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          elevation: 2,
+        ),
+      ),
       home: const HomeScreen(),
     );
   }

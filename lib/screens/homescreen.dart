@@ -25,35 +25,21 @@ class _HomeScreenState extends State<HomeScreen>
     loadTasks();
   }
 
-  // ✅ FIXED LOAD (safe + no crash + persistent)
   void loadTasks() {
     final data = taskBox.get('tasks');
 
     if (data == null) {
-      setState(() {
-        tasks = [];
-      });
+      tasks = [];
       return;
     }
 
-    setState(() {
-      tasks = List<Map<String, dynamic>>.from(
-        (data as List).map((e) => Map<String, dynamic>.from(e)),
-      );
-    });
+    tasks = List<Map<String, dynamic>>.from(
+      (data as List).map((e) => Map<String, dynamic>.from(e)),
+    );
   }
 
-  // ✅ FIXED SAVE (IMPORTANT)
   Future<void> saveTasks() async {
     await taskBox.put('tasks', tasks);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      saveTasks();
-    }
   }
 
   @override
@@ -94,60 +80,15 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  void editTaskDialog(Map<String, dynamic> task) {
-    TextEditingController controller =
-        TextEditingController(text: task["title"]);
-
-    String tempPriority = task["priority"];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Edit Task"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: controller),
-              DropdownButtonFormField<String>(
-                value: tempPriority,
-                items: const [
-                  DropdownMenuItem(value: "High", child: Text("High")),
-                  DropdownMenuItem(value: "Medium", child: Text("Medium")),
-                  DropdownMenuItem(value: "Low", child: Text("Low")),
-                ],
-                onChanged: (value) {
-                  tempPriority = value!;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  task["title"] = controller.text;
-                  task["priority"] = tempPriority;
-                });
-
-                await saveTasks();
-                Navigator.pop(context);
-              },
-              child: const Text("Save"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget buildTaskCard(Map<String, dynamic> task) {
     return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
         leading: Checkbox(
           value: task["done"],
           onChanged: (value) async {
@@ -165,40 +106,27 @@ class _HomeScreenState extends State<HomeScreen>
             }
           },
         ),
-        title: Text(task["title"]),
+        title: Text(
+          task["title"],
+          style: TextStyle(
+            decoration:
+                task["done"] ? TextDecoration.lineThrough : null,
+          ),
+        ),
         subtitle: Text("Due: ${task["deadline"]}"),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
-              decoration: BoxDecoration(
-                color: getPriorityColor(task["priority"]),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                task["priority"],
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => editTaskDialog(task),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () async {
-                setState(() {
-                  tasks.remove(task);
-                });
-
-                await saveTasks();
-              },
-            ),
-          ],
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
+          ),
+          decoration: BoxDecoration(
+            color: getPriorityColor(task["priority"]),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            task["priority"],
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );
@@ -221,11 +149,6 @@ class _HomeScreenState extends State<HomeScreen>
                 "Exam Planner",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text("Home"),
-              onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.add),
@@ -251,23 +174,43 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Pending Tasks",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              "📚 Your Study Tasks",
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
-            ...pending.map(buildTaskCard),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             const Text(
-              "Done",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              "Pending Tasks",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-            ...done.map(buildTaskCard),
+
+            const SizedBox(height: 10),
+
+            Expanded(
+              child: ListView(
+                children: [
+                  ...pending.map(buildTaskCard),
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    "Completed",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ...done.map(buildTaskCard),
+                ],
+              ),
+            ),
           ],
         ),
       ),

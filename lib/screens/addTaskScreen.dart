@@ -9,6 +9,7 @@ class AddTaskScreen extends StatefulWidget {
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController titleController = TextEditingController();
+
   String selectedPriority = "Medium";
   String selectedDeadline = "Select Deadline";
 
@@ -43,7 +44,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       "title": titleController.text,
       "deadline": selectedDeadline,
       "priority": selectedPriority,
-      "done": false
+      "done": false,
     });
   }
 
@@ -53,10 +54,26 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       appBar: AppBar(
         title: const Text("Add New Task"),
       ),
-      body: Padding(
+
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // 🔹 Title
+            const Text(
+              "Create a New Task",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🔹 Task Title Input
             TextField(
               controller: titleController,
               decoration: const InputDecoration(
@@ -64,24 +81,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+
             const SizedBox(height: 20),
 
+            // 🔹 Date Picker
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: pickDate,
                 icon: const Icon(Icons.calendar_today),
                 label: Text(selectedDeadline),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            // 🔹 Priority Dropdown
             DropdownButtonFormField<String>(
               value: selectedPriority,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
                 labelText: "Priority",
+                border: OutlineInputBorder(),
               ),
               items: const [
                 DropdownMenuItem(value: "High", child: Text("High")),
@@ -97,11 +120,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
             const SizedBox(height: 30),
 
+            // 🔹 Save Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: saveTask,
-                child: const Text("Save Task"),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  "Save Task",
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ],
