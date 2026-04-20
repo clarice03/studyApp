@@ -29,9 +29,7 @@ class _HomeScreenState extends State<HomeScreen>
     final data = taskBox.get('tasks');
 
     if (data == null) {
-      setState(() {
-        tasks = [];
-      });
+      setState(() => tasks = []);
       return;
     }
 
@@ -97,10 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
         leading: Checkbox(
           value: task["done"],
           onChanged: (value) async {
-            setState(() {
-              task["done"] = value;
-            });
-
+            setState(() => task["done"] = value);
             await saveTasks();
 
             if (value == true) {
@@ -125,13 +120,9 @@ class _HomeScreenState extends State<HomeScreen>
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-
-            // 🔹 Priority badge
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
+                  horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: getPriorityColor(task["priority"]),
                 borderRadius: BorderRadius.circular(12),
@@ -141,28 +132,24 @@ class _HomeScreenState extends State<HomeScreen>
                 style: const TextStyle(color: Colors.white),
               ),
             ),
-
             const SizedBox(width: 8),
 
-            // 🔹 DELETE BUTTON WITH CONFIRMATION
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
                 final confirm = await showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
+                  builder: (_) => AlertDialog(
                     title: const Text("Delete Task"),
                     content: const Text(
                         "Are you sure you want to delete this task?"),
                     actions: [
                       TextButton(
-                        onPressed: () =>
-                            Navigator.pop(context, false),
+                        onPressed: () => Navigator.pop(context, false),
                         child: const Text("Cancel"),
                       ),
                       ElevatedButton(
-                        onPressed: () =>
-                            Navigator.pop(context, true),
+                        onPressed: () => Navigator.pop(context, true),
                         child: const Text("Delete"),
                       ),
                     ],
@@ -170,10 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
                 );
 
                 if (confirm == true) {
-                  setState(() {
-                    tasks.remove(task);
-                  });
-
+                  setState(() => tasks.remove(task));
                   await saveTasks();
                 }
               },
@@ -188,6 +172,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final pending = tasks.where((t) => t["done"] == false).toList();
     final done = tasks.where((t) => t["done"] == true).toList();
+
+    double progress = tasks.isEmpty
+        ? 0
+        : done.length / tasks.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Exam Planner")),
@@ -217,8 +205,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const LibrariesScreen(),
-                  ),
+                      builder: (_) => const LibrariesScreen()),
                 );
               },
             ),
@@ -226,30 +213,20 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
 
-      // ✅ EMPTY STATE (UNCHANGED)
       body: tasks.isEmpty
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    Icons.menu_book,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
+                children: [
+                  Icon(Icons.menu_book,
+                      size: 80, color: Colors.grey),
                   SizedBox(height: 20),
-                  Text(
-                    "No tasks yet!",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text("No tasks yet!",
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
-                  Text(
-                    "Tap + to add one 📚",
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  Text("Tap + to add one 📚"),
                 ],
               ),
             )
@@ -258,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   const Text(
                     "📚 Your Study Tasks",
                     style: TextStyle(
@@ -267,7 +245,23 @@ class _HomeScreenState extends State<HomeScreen>
 
                   const SizedBox(height: 15),
 
-                  // ✅ ONLY CHANGE: added count here
+                  // 🔵 PROGRESS BAR (FINAL FEATURE)
+                  Text(
+                    "Progress: ${(progress * 100).toStringAsFixed(0)}%",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 10,
+                    backgroundColor: Colors.grey.shade300,
+                    color: Colors.blue,
+                  ),
+
+                  const SizedBox(height: 15),
+
                   Text(
                     "Pending Tasks (${pending.length})",
                     style: const TextStyle(
@@ -284,7 +278,6 @@ class _HomeScreenState extends State<HomeScreen>
 
                         const SizedBox(height: 20),
 
-                        // ✅ ONLY CHANGE: added count here
                         Text(
                           "Completed (${done.length})",
                           style: const TextStyle(
