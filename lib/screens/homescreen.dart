@@ -29,13 +29,17 @@ class _HomeScreenState extends State<HomeScreen>
     final data = taskBox.get('tasks');
 
     if (data == null) {
-      tasks = [];
+      setState(() {
+        tasks = [];
+      });
       return;
     }
 
-    tasks = List<Map<String, dynamic>>.from(
-      (data as List).map((e) => Map<String, dynamic>.from(e)),
-    );
+    setState(() {
+      tasks = List<Map<String, dynamic>>.from(
+        (data as List).map((e) => Map<String, dynamic>.from(e)),
+      );
+    });
   }
 
   Future<void> saveTasks() async {
@@ -174,46 +178,77 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "📚 Your Study Tasks",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 15),
-
-            const Text(
-              "Pending Tasks",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-
-            const SizedBox(height: 10),
-
-            Expanded(
-              child: ListView(
+      // ✅ IMPROVED EMPTY STATE
+      body: tasks.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.menu_book,
+                    size: 80,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "No tasks yet!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Tap + to add one 📚",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...pending.map(buildTaskCard),
+                  const Text(
+                    "📚 Your Study Tasks",
+                    style: TextStyle(
+                        fontSize: 26, fontWeight: FontWeight.bold),
+                  ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   const Text(
-                    "Completed",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    "Pending Tasks",
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w600),
                   ),
 
                   const SizedBox(height: 10),
 
-                  ...done.map(buildTaskCard),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        ...pending.map(buildTaskCard),
+
+                        const SizedBox(height: 20),
+
+                        const Text(
+                          "Completed",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        ...done.map(buildTaskCard),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: navigateToAddTask,
