@@ -120,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen>
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Priority badge
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 10, vertical: 5),
@@ -132,8 +133,73 @@ class _HomeScreenState extends State<HomeScreen>
                 style: const TextStyle(color: Colors.white),
               ),
             ),
+
             const SizedBox(width: 8),
 
+            // ✏️ EDIT BUTTON
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () {
+                TextEditingController controller =
+                    TextEditingController(text: task["title"]);
+
+                String tempPriority = task["priority"];
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Edit Task"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: controller,
+                          decoration: const InputDecoration(
+                            labelText: "Task Title",
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        DropdownButtonFormField<String>(
+                          value: tempPriority,
+                          items: const [
+                            DropdownMenuItem(
+                                value: "High", child: Text("High")),
+                            DropdownMenuItem(
+                                value: "Medium", child: Text("Medium")),
+                            DropdownMenuItem(
+                                value: "Low", child: Text("Low")),
+                          ],
+                          onChanged: (value) {
+                            tempPriority = value!;
+                          },
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            task["title"] = controller.text;
+                            task["priority"] = tempPriority;
+                          });
+
+                          await saveTasks();
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Save"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+
+            // 🗑 DELETE BUTTON
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
@@ -145,11 +211,13 @@ class _HomeScreenState extends State<HomeScreen>
                         "Are you sure you want to delete this task?"),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.pop(context, false),
+                        onPressed: () =>
+                            Navigator.pop(context, false),
                         child: const Text("Cancel"),
                       ),
                       ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
+                        onPressed: () =>
+                            Navigator.pop(context, true),
                         child: const Text("Delete"),
                       ),
                     ],
@@ -173,9 +241,8 @@ class _HomeScreenState extends State<HomeScreen>
     final pending = tasks.where((t) => t["done"] == false).toList();
     final done = tasks.where((t) => t["done"] == true).toList();
 
-    double progress = tasks.isEmpty
-        ? 0
-        : done.length / tasks.length;
+    double progress =
+        tasks.isEmpty ? 0 : done.length / tasks.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Exam Planner")),
@@ -244,6 +311,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
 
                   const SizedBox(height: 15),
+
                   Text(
                     "Progress: ${(progress * 100).toStringAsFixed(0)}%",
                     style: const TextStyle(fontSize: 16),
